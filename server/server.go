@@ -4,6 +4,7 @@ import (
 	"course_system/controller"
 	"encoding/gob"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"reflect"
@@ -25,8 +26,29 @@ type funcMap map[string]interface{}
 var Stub = funcMap{}
 
 func init() {
-	Stub["StuDisenroll"] = controller.GlobalSystem.StuDisenroll
-	Stub["StuEnroll"] = controller.GlobalSystem.StuEnroll
+
+}
+
+func RegisterMethod(o interface{}) {
+	v := reflect.ValueOf(o)
+	fmt.Printf("%d\n", v.NumMethod())
+
+	for i := 0; i < v.NumMethod(); i++ {
+		m := v.Method(i)
+		if m.Type().NumOut() != 1 {
+			continue
+		}
+		if m.Type().Out(0).Kind() != reflect.Slice {
+			continue
+		}
+		if m.Type().Out(0).Elem().Kind() != reflect.String {
+			continue
+		}
+
+		methodName := v.Type().Method(i).Name
+		Stub[methodName] = m
+		fmt.Println("regist", methodName)
+	}
 }
 
 func Handle(conn net.Conn) {
@@ -57,7 +79,7 @@ func Handle(conn net.Conn) {
 }
 
 func Call(name string, params ...interface{}) (result []reflect.Value, err error) {
-	f := reflect.ValueOf(Stub[name])
+	f := Stub[name].(reflect.Value)
 	if len(params) != f.Type().NumIn() {
 		err = errors.New("the number of params is out of index")
 	}

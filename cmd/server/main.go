@@ -21,6 +21,8 @@ func main() {
 	controller.GlobalSystem.RegisterCourse(c2)
 	controller.GlobalSystem.RegisterCourse(c3)
 
+	server.RegisterMethod(&controller.GlobalSystem)
+
 	port := flag.Int("port", 8000, "listen port")
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
