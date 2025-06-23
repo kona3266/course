@@ -12,8 +12,16 @@ type CentralSystem struct {
 /*
 s1 s1 s1 s3 s2
 */
-var GlobalSystem = CentralSystem{course_member: make(map[string]*Course)}
+func NewCentralSystem() *CentralSystem {
+	return &CentralSystem{course_member: make(map[string]*Course)}
+}
+
+var DefaultCentralSystem = NewCentralSystem()
 var stuLock = NewMultipleLock()
+
+func RegisterCourse(c *Course) error {
+	return DefaultCentralSystem.RegisterCourse(c)
+}
 
 func (s *CentralSystem) RegisterCourse(c *Course) error {
 	s.mu.Lock()

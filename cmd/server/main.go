@@ -17,11 +17,11 @@ func main() {
 	c2 := controller.NewCourse("MATH101", "Linear algebra", 3)
 	c3 := controller.NewCourse("MATH102", "Calculus", 3)
 
-	controller.GlobalSystem.RegisterCourse(c1)
-	controller.GlobalSystem.RegisterCourse(c2)
-	controller.GlobalSystem.RegisterCourse(c3)
+	controller.RegisterCourse(c1)
+	controller.RegisterCourse(c2)
+	controller.RegisterCourse(c3)
 
-	server.RegisterMethod(&controller.GlobalSystem)
+	server.RegisterMethod(controller.DefaultCentralSystem)
 
 	port := flag.Int("port", 8000, "listen port")
 	sigs := make(chan os.Signal, 1)
@@ -35,7 +35,7 @@ func main() {
 	}
 	go func() {
 		<-sigs
-		controller.GlobalSystem.ShowAll()
+		controller.DefaultCentralSystem.ShowAll()
 		os.Exit(0)
 	}()
 
