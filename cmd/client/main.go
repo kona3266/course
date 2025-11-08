@@ -12,7 +12,7 @@ import (
 func main() {
 
 	var c sync.WaitGroup
-	wait_list := []string{"CS61A", "MATH101", "MATH102"               }
+	wait_list := []string{"CS61A", "MATH101", "MATH102"}
 	stu_list := []*controller.Student{}
 	for i := 0; i < 5; i++ {
 		name := fmt.Sprint("Eminem", i)
