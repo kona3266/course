@@ -1,5 +1,3 @@
-
-
 name: Go formater
 on:
   pull_request:
