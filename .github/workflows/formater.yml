@@ -8,12 +8,14 @@ jobs:
   build:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          ref: ${{ github.event.pull_request.base.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -21,8 +23,29 @@ jobs:
           go-version: '1.21' 
           
       - name: Run go fmt
+        id: fmt
+        env:
+          host: ${{ secrets.HOST }}
         run: |
+          echo "$host"
           echo "Running go fmt on current directory..."
           go fmt ./...
           echo "Formatting completed!"
+          if git diff --quiet; then
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.fmt.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -a -m "style: auto-format with go fmt"
+          
+          echo "Pushing changes to ${{ github.event.pull_request.base.ref }} branch..."
+          git push origin ${{ github.event.pull_request.base.ref }}
+
+        
         
