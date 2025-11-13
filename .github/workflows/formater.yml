@@ -24,10 +24,7 @@ jobs:
           
       - name: Run go fmt
         id: fmt
-        env:
-          host: ${{ secrets.HOST }}
         run: |
-          echo "$host"
           echo "Running go fmt on current directory..."
           go fmt ./...
           echo "Formatting completed!"
